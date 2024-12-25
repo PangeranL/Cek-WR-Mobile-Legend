@@ -6,3 +6,26 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.particle {
+  animation: float infinite linear;
+  opacity: 0;
+  filter: blur(1px); /* Menambahkan sedikit blur */
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(100vh) translateX(-100px) rotate(0);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.8;  /* Opacity lebih tinggi */
+  }
+  80% {
+    opacity: 0.8;  /* Opacity lebih tinggi */
+  }
+  100% {
+    transform: translateY(-200px) translateX(100px) rotate(360deg);
+    opacity: 0;
+  }
+}

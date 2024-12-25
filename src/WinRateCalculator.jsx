@@ -105,6 +105,17 @@ const WinRateCalculator = () => {
             </div>
           )}
         </div>
+
+        {/* Copyright Section */}
+        <div className="pt-8 text-center">
+          <p className="text-sm text-gray-500">
+            © {new Date().getFullYear()} Created by Panjul Auditore. All rights reserved.
+          </p>
+          <p className="text-xs text-gray-600 mt-1">
+            Protected by copyright law. Unauthorized reproduction or distribution of this application is prohibited.
+          </p>
+        </div>
+
       </div>
     </div>
   );

@@ -1,25 +1,33 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 
 const AnimatedBackground = () => {
-  // Generate 30 particles dengan ukuran lebih besar
-  const particles = Array.from({ length: 30 }, (_, i) => (
-    <div
-      key={i}
-      className="particle absolute rounded-full bg-purple-600/40"
-      style={{
-        left: `${Math.random() * 100}%`,
-        top: `${Math.random() * 100}%`,
-        width: `${Math.random() * 100 + 30}px`,  // Ukuran lebih besar
-        height: `${Math.random() * 100 + 30}px`, // Ukuran lebih besar
-        animationDuration: `${Math.random() * 15 + 10}s`, // Durasi lebih cepat
-        animationDelay: `${Math.random() * 5}s`
-      }}
-    />
-  ));
+  // Menggunakan useMemo untuk menjaga agar particles tidak di-regenerate saat re-render
+  const particles = useMemo(() => 
+    Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() * 100 + 30,
+      duration: Math.random() * 8 + 8,
+      delay: Math.random() * 2
+    })), []); // Empty dependency array means this will only run once
 
   return (
-    <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {particles}
+    <div className="fixed inset-0 overflow-hidden pointer-events-none bg-gradient-to-b from-black to-purple-950">
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className="particle absolute rounded-full bg-purple-600/40"
+          style={{
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            animationDuration: `${particle.duration}s`,
+            animationDelay: `${particle.delay}s`
+          }}
+        />
+      ))}
     </div>
   );
 };

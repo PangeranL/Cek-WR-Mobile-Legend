@@ -7,27 +7,33 @@ const WinRateCalculator = () => {
   const [targetWR, setTargetWR] = useState('');
   const [result, setResult] = useState('');
 
-  const calculateRequiredWins = () => {
+  const calculateWinRate = () => {
     const matches = parseInt(totalMatch);
     const wins = parseInt(totalWin);
     const target = parseInt(targetWR);
     
-    if (isNaN(matches) || isNaN(wins) || isNaN(target) || matches < wins || target > 100) {
+    // Validasi input kosong atau NaN
+    if (isNaN(matches) || isNaN(wins) || isNaN(target)) {
       setResult('Mohon masukkan angka yang valid');
       return;
     }
 
-    const currentWR = (wins / matches) * 100;
-    
-    if (currentWR >= target) {
-      setResult('Anda sudah mencapai target Win Rate!');
+    // Validasi untuk angka negatif dan target WR
+    if (matches <= 0 || wins < 0 || target < 0 || target > 100) {
+      setResult('Mohon masukkan angka yang valid');
       return;
     }
 
-    const requiredMatches = Math.ceil((target * matches - 100 * wins) / (100 - target));
-    const requiredWins = Math.ceil(((target * (matches + requiredMatches)) / 100) - wins);
+    // Handle special case for 100% target
+    if (target === 100) {
+      setResult(['YOU NEED ABOUT ', 'INFINITY WIN WITHOUT LOSE', ' TO GET A ', '100% WIN RATE.']);
+      return;
+    }
 
-    setResult(['You need about ', `${requiredWins} Win without Lose`, ' to get a ', `${target}% Win Rate.`]);
+    // Rumus yang benar
+    const neededWins = Math.ceil((target * matches - (100 * wins)) / (100 - target));
+
+    setResult(['You need about ', `${neededWins} Win without Lose`, ' to get a ', `${target}% Win Rate.`]);
   };
 
   return (
@@ -52,8 +58,11 @@ const WinRateCalculator = () => {
             <input
               type="number"
               value={totalMatch}
-              onChange={(e) => setTotalMatch(e.target.value)}
-              className="w-full p-3 rounded bg-gray-900/70 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 backdrop-blur-sm"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) setTotalMatch(value);
+              }}
+              className="w-full p-3 rounded bg-gray-600/50 text-white placeholder-gray-400"
               placeholder="Contoh: 223"
             />
           </div>
@@ -65,8 +74,11 @@ const WinRateCalculator = () => {
             <input
               type="number"
               value={totalWin}
-              onChange={(e) => setTotalWin(e.target.value)}
-              className="w-full p-3 rounded bg-gray-900/70 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 backdrop-blur-sm"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) setTotalWin(value);
+              }}
+              className="w-full p-3 rounded bg-gray-600/50 text-white placeholder-gray-400"
               placeholder="Contoh: 54"
             />
           </div>
@@ -78,28 +90,31 @@ const WinRateCalculator = () => {
             <input
               type="number"
               value={targetWR}
-              onChange={(e) => setTargetWR(e.target.value)}
-              className="w-full p-3 rounded bg-gray-900/70 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-purple-500 backdrop-blur-sm"
+              onChange={(e) => {
+                const value = e.target.value;
+                if (value >= 0) setTargetWR(value);
+              }}
+              className="w-full p-3 rounded bg-gray-600/50 text-white placeholder-gray-400"
               placeholder="Contoh: 70"
             />
           </div>
 
           <button
-            onClick={calculateRequiredWins}
-            className="w-full p-3 rounded bg-purple-600 hover:bg-purple-700 text-white font-medium mt-6 transition-colors duration-200 hover:shadow-lg hover:shadow-purple-500/50"
+            onClick={calculateWinRate}
+            className="w-full p-3 rounded bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors duration-200"
           >
             Hitung
           </button>
 
           {result && (
-            <div className="mt-4 p-4 rounded bg-gray-900/70 text-center border border-purple-500/50 backdrop-blur-sm">
-              <p className="text-white font-medium">
+            <div className="mt-4 p-4 rounded bg-gray-600/50 text-center border border-gray-500">
+              <p className="text-white font-medium uppercase">
                 {Array.isArray(result) ? (
                   <>
                     {result[0]}
-                    <span className="text-purple-400">{result[1]}</span>
+                    <span className="text-purple-400 font-bold">{result[1]}</span>
                     {result[2]}
-                    <span className="text-purple-400">{result[3]}</span>
+                    <span className="text-purple-400 font-bold">{result[3]}</span>
                   </>
                 ) : (
                   result

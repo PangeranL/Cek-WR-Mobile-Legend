@@ -1,5 +1,37 @@
-import React, { useState } from 'react';
-import AnimatedBackground from './AnimatedBackground';
+import React, { useState, useMemo } from 'react';
+
+// Komponen AnimatedBackground
+const AnimatedBackground = () => {
+  const particles = useMemo(() => 
+    Array.from({ length: 30 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      size: Math.random() * 100 + 30,
+      duration: Math.random() * 8 + 8,
+      delay: Math.random() * 2
+    })), []
+  );
+
+  return (
+    <div className="fixed inset-0 overflow-hidden pointer-events-none bg-gradient-to-b from-black to-purple-950">
+      {particles.map((particle) => (
+        <div
+          key={particle.id}
+          className="particle absolute rounded-full bg-purple-600/40"
+          style={{
+            left: `${particle.left}%`,
+            top: `${particle.top}%`,
+            width: `${particle.size}px`,
+            height: `${particle.size}px`,
+            animationDuration: `${particle.duration}s`,
+            animationDelay: `${particle.delay}s`
+          }}
+        />
+      ))}
+    </div>
+  );
+};
 
 const WinRateCalculator = () => {
   const [totalMatch, setTotalMatch] = useState('');
@@ -7,33 +39,39 @@ const WinRateCalculator = () => {
   const [targetWR, setTargetWR] = useState('');
   const [result, setResult] = useState('');
 
-  const calculateWinRate = () => {
-    const matches = parseInt(totalMatch);
-    const wins = parseInt(totalWin);
-    const target = parseInt(targetWR);
+      const calculateWinRate = () => {
+    const matches = parseInt(totalMatch);   // Total seluruh pertandingan saat ini
+    const wins = parseInt(totalWin);        // Total menang saat ini
+    const target = parseInt(targetWR);      // Target win rate dalam persen
     
-    // Validasi input kosong atau NaN
+    // Validasi input
     if (isNaN(matches) || isNaN(wins) || isNaN(target)) {
       setResult('Mohon masukkan angka yang valid');
       return;
     }
 
-    // Validasi untuk angka negatif dan target WR
-    if (matches <= 0 || wins < 0 || target < 0 || target > 100) {
+    // Validasi angka negatif dan target WR
+    if (matches < 0 || wins < 0 || target < 0 || target > 100) {
       setResult('Mohon masukkan angka yang valid');
       return;
     }
 
-    // Handle special case for 100% target
+    // Special case untuk target 100%
     if (target === 100) {
       setResult(['YOU NEED ABOUT ', 'INFINITY WIN WITHOUT LOSE', ' TO GET A ', '100% WIN RATE.']);
       return;
     }
 
-    // Rumus yang benar
-    const neededWins = Math.ceil((target * matches - (100 * wins)) / (100 - target));
+    // Rumus yang benar:
+    // X = (WR * M - 100W) / (100 - WR)
+    // dimana:
+    // X = jumlah win yang dibutuhkan
+    // WR = target win rate
+    // M = total match
+    // W = total win saat ini
+    const neededWins = Math.ceil((target * matches - 100 * wins) / (100 - target));
 
-    setResult(['You need about ', `${neededWins} Win without Lose`, ' to get a ', `${target}% Win Rate.`]);
+    setResult(['You need about ', `${Math.abs(neededWins)} Win without Lose`, ' to get a ', `${target}% Win Rate.`]);
   };
 
   return (
@@ -101,7 +139,7 @@ const WinRateCalculator = () => {
 
           <button
             onClick={calculateWinRate}
-            className="w-full p-3 rounded bg-purple-600 hover:bg-purple-700 text-white font-medium transition-colors duration-200"
+            className="w-full p-3 rounded bg-purple-600 hover:bg-purple-700 text-white font-medium"
           >
             Hitung
           </button>
